@@ -1,16 +1,21 @@
 package main
 
 import (
+	"Project/websocket/webconn"
+	"fmt"
 	"net/http"
+	"sync"
 	"time"
-
-	"Project/websocket/impl"
 
 	"github.com/gorilla/websocket"
 )
 
 var (
+	userConn = sync.Map{}
+
 	upgrader = websocket.Upgrader{
+		ReadBufferSize:  16,
+		WriteBufferSize: 16,
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
@@ -22,13 +27,17 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		wsConn *websocket.Conn
 		err    error
 		data   []byte
-		conn   *impl.Connection
+		conn   *webconn.Connection
 	)
 	if wsConn, err = upgrader.Upgrade(w, r, nil); err != nil {
 		return
 	}
-	if conn, err = impl.NewConnection(wsConn); err != nil {
-		goto ERR
+	// if req, err := ioutil.ReadAll(r.Body); err != nil {
+	// 	return
+	// }
+	fmt.Println(wsConn.LocalAddr().String())
+	if conn, err = webconn.NewConnection(wsConn); err != nil {
+		return
 	}
 
 	go func() {
@@ -37,7 +46,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			if err = conn.WriteMessage([]byte("heartbeat")); err != nil {
 				return
 			}
-			time.Sleep(time.Second * 1)
+			time.Sleep(time.Second * 4)
 		}
 
 	}()
@@ -53,6 +62,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 ERR:
+	fmt.Println("close")
 	conn.Close()
 }
 
