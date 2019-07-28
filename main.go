@@ -2,16 +2,18 @@ package main
 
 import (
 	"Project/websocket/webconn"
-	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/julienschmidt/httprouter"
 )
 
 var (
-	userConn = sync.Map{}
+	// [uid(int)][wsConn]
+	userWsConn = sync.Map{}
 
 	upgrader = websocket.Upgrader{
 		ReadBufferSize:  16,
@@ -22,51 +24,40 @@ var (
 	}
 )
 
-func wsHandler(w http.ResponseWriter, r *http.Request) {
+// RegisterRouter 注册路由
+func RegisterRouter() *httprouter.Router {
+	router := httprouter.New()
+	router.GET("/api/Listen/contest/:contestID/user/:uID", wsHandler)
+	return router
+}
+
+func wsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var (
-		wsConn *websocket.Conn
-		err    error
-		data   []byte
-		conn   *webconn.Connection
+		wsConn    *websocket.Conn
+		err       error
+		uID       int
+		contestID int
 	)
+
+	// 取出uID
+	if uID, err = strconv.Atoi(p.ByName("uID")); err != nil {
+		return
+	}
+
+	// 取出contestID
+	if contestID, err = strconv.Atoi(p.ByName("contestID")); err != nil {
+		return
+	}
+
 	if wsConn, err = upgrader.Upgrade(w, r, nil); err != nil {
 		return
 	}
-	// if req, err := ioutil.ReadAll(r.Body); err != nil {
-	// 	return
-	// }
-	fmt.Println(wsConn.LocalAddr().String())
-	if conn, err = webconn.NewConnection(wsConn); err != nil {
-		return
-	}
 
-	go func() {
-		var err error
-		for {
-			if err = conn.WriteMessage([]byte("heartbeat")); err != nil {
-				return
-			}
-			time.Sleep(time.Second * 4)
-		}
-
-	}()
-
-	for {
-		if data, err = conn.ReadMessage(); err != nil {
-			goto ERR
-		}
-
-		if err = conn.WriteMessage(data); err != nil {
-			goto ERR
-		}
-	}
-
-ERR:
-	fmt.Println("close")
-	conn.Close()
+	_ = webconn.NewConnection(wsConn, uID, contestID)
 }
 
 func main() {
-	http.HandleFunc("/ws", wsHandler)
-	http.ListenAndServe("0.0.0.0:7777", nil)
+	r := RegisterRouter()
+	go webconn.ListenkillSignal()
+	log.Println(http.ListenAndServe("127.0.0.1:8081", r))
 }
