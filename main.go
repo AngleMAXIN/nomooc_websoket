@@ -2,6 +2,8 @@ package main
 
 import (
 	"Project/websocket/webconn"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,7 +29,9 @@ var (
 // RegisterRouter 注册路由
 func RegisterRouter() *httprouter.Router {
 	router := httprouter.New()
+	// router.GET("/keep-listening/contest/:contestID/user/:uID", wsHandler)
 	router.GET("/api/Listen/contest/:contestID/user/:uID", wsHandler)
+
 	return router
 }
 
@@ -57,7 +61,18 @@ func wsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func main() {
+	port := flag.String("port", "8888", "server port")
+	flag.Parse()
+
 	r := RegisterRouter()
 	go webconn.ListenkillSignal()
-	log.Println(http.ListenAndServe("127.0.0.1:8081", r))
+
+	serverAddr := fmt.Sprintf("%s:%s", "127.0.0.1", *port)
+	log.Println("WebSocket Server Listen At:", serverAddr)
+
+	// http.Handle("/", r)
+	// http.ListenAndServe(serverAddr, nil)
+
+	log.Println(http.ListenAndServe(serverAddr, r))
+
 }
