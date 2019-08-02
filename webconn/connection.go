@@ -40,7 +40,7 @@ func NewConnection(wsConn *websocket.Conn, uID, contestID int) (conn *CustomerCo
 
 // ListenkillSignal 监听conn断开信号，并更新用户状态
 func ListenkillSignal() {
-	killChan = make(chan userOne, 20)
+	killChan = make(chan userOne, 10)
 	for v := range killChan {
 		go db.MarkUserStatus(v.uID, v.contestID)
 	}
