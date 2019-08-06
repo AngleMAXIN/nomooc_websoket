@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -55,11 +56,13 @@ func DecrOnlineNum(contestID int) (err error) {
 }
 
 // GetOnlineNum 获取当前在线人数
-func GetOnlineNum(contestID int) (num string, err error) {
-	num, err = redisDao.Get(fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)).Result()
+func GetOnlineNum(contestID int) (num int, err error) {
+	var resVal string
+	resVal, err = redisDao.Get(fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)).Result()
 	if err != nil {
-		return "0", err
+		return 0, err
 	}
+	num, _ = strconv.Atoi(resVal)
 	return
 }
 
