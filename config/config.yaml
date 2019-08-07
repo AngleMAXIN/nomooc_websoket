@@ -1,0 +1,20 @@
+mysql:
+  port: 3306
+  host: 127.0.0.1
+  user: root
+  passwd: maxinz
+  db: "oj_database"
+  loc: Asia/Shanghai
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  db: 2
+  DialTime:  30 
+  ReadTime:  10 
+  WriteTime: 10 
+  PoolSize:     5
+    
+Server:
+  host: 127.0.0.1
+  MaxConnLimit: 600
