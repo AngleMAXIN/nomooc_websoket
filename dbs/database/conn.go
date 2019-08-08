@@ -1,30 +1,38 @@
 package database
 
 import (
+	prcf "Project/websocket/config"
 	"database/sql"
+	"fmt"
 	"log"
+	"net/url"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	sqlStr = `UPDATE contest_partner SET is_disabled='1' WHERE user_id = ? and contest_id = ?;`
-)
-
-var (
-	dbConn *sql.DB
-	err    error
-	stmUp  *sql.Stmt
-)
-
 func init() {
-	if dbConn, err = sql.Open("mysql", "root:maxinz@tcp(localhost:3306)/oj_database?charset=utf8"); err != nil {
+	var (
+		err error
+	)
+	cf := prcf.ProConfig.GetMysqlConfig()
+
+	// loc := url.QueryEscape("Asia/Shanghai")
+	uri := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&loc=%s&parseTime=true",
+		cf.User, cf.Passwd, cf.Host, cf.Port, cf.DB, url.QueryEscape(cf.Loc))
+
+	if dbConn, err = sql.Open("mysql", uri); err != nil {
 		panic(err.Error())
 	}
 
-	if stmUp, err = dbConn.Prepare(sqlStr); err != nil {
+	if stmUpdateUserStatus, err = dbConn.Prepare(updateSQLStr); err != nil {
 		log.Printf("Prepare update SQl Failed: %s\n", err)
 		return
 	}
+
+	if stmSelectEndTiem, err = dbConn.Prepare(selectSQLStr); err != nil {
+		log.Printf("Prepare select SQl Failed: %s\n", err)
+		return
+	}
+	fmt.Println(stmSelectEndTiem)
 
 }

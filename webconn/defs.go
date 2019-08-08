@@ -1,11 +1,13 @@
 package webconn
 
 import (
+	prcf "Project/websocket/config"
+
 	"github.com/gorilla/websocket"
 )
 
-const (
-	maxConnLimit = 500
+var (
+	maxConnLimit int
 )
 
 type notify struct{}
@@ -21,11 +23,6 @@ type CustomerConnection struct {
 	user   userOne
 }
 
-// Response 响应体
-type Response struct {
-	Errno int         `json:"errno"`
-	Msg   string      `json:"msg"`
-	Data  interface{} `json:"data"`
+func init() {
+	maxConnLimit = prcf.ProConfig.GetServerConfig().MaxConnLimit
 }
-
-
