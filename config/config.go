@@ -13,7 +13,7 @@ func init() {
 	var err error
 
 	configReader := viper.New()
-	configReader.AddConfigPath("./")
+	configReader.AddConfigPath("./config")
 	configReader.SetConfigName("config")
 	configReader.SetConfigType("yaml")
 

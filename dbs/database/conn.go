@@ -16,7 +16,6 @@ func init() {
 	)
 	cf := prcf.ProConfig.GetMysqlConfig()
 
-	// loc := url.QueryEscape("Asia/Shanghai")
 	uri := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&loc=%s&parseTime=true",
 		cf.User, cf.Passwd, cf.Host, cf.Port, cf.DB, url.QueryEscape(cf.Loc))
 
@@ -33,6 +32,5 @@ func init() {
 		log.Printf("Prepare select SQl Failed: %s\n", err)
 		return
 	}
-	fmt.Println(stmSelectEndTiem)
 
 }
