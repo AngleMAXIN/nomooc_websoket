@@ -23,8 +23,9 @@ type RedisConfig struct {
 
 // ServerConfig 监听服务的相关配置
 type ServerConfig struct {
-	Host         string
-	MaxConnLimit int
+	Host             string
+	MaxConnLimit     int
+	CurrentConnLimit int
 }
 
 // Config 全局总配置

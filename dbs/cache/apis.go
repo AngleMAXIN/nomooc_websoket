@@ -49,3 +49,12 @@ func GetOnlineNum(contestID int) (num int, err error) {
 	num, _ = strconv.Atoi(resVal)
 	return
 }
+
+// DeleteOnlineNum 删除当前数据
+func DeleteOnlineNum(contestID int) (err error) {
+	err = redisDao.Del(fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)).Err()
+	if err != nil {
+		return
+	}
+	return
+}

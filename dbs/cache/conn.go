@@ -16,13 +16,14 @@ func init() {
 // GetRedisConn 获得redis conn
 func GetRedisConn() *redis.Client {
 	cf := prcf.ProConfig.GetRedisConfig()
+
 	client := redis.NewClient(&redis.Options{
 		Addr:         fmt.Sprintf("%s:%d", cf.Host, cf.Port),
 		DialTimeout:  time.Duration(cf.DialTime) * time.Second,
 		ReadTimeout:  time.Duration(cf.ReadTime) * time.Second,
 		WriteTimeout: time.Duration(cf.WriteTime) * time.Second,
-		Password:     "",    // no password set
-		DB:           cf.DB, // use default DB
+		Password:     "",
+		DB:           cf.DB,
 		PoolSize:     cf.PoolSize,
 	})
 

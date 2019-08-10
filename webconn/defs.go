@@ -7,7 +7,10 @@ import (
 )
 
 var (
-	maxConnLimit int
+	// MaxConnNum 最大的连接数
+	wsConnBucket chan notify
+	killChan     chan *userOne
+	cf           prcf.ServerConfig
 )
 
 type notify struct{}
@@ -21,8 +24,4 @@ type userOne struct {
 type CustomerConnection struct {
 	wsConn *websocket.Conn
 	user   userOne
-}
-
-func init() {
-	maxConnLimit = prcf.ProConfig.GetServerConfig().MaxConnLimit
 }

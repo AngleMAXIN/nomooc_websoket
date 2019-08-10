@@ -18,3 +18,4 @@ redis:
 Server:
   host: 127.0.0.1
   MaxConnLimit: 600
+  CurrentConnLimit: 300 

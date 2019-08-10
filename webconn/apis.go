@@ -1,6 +1,7 @@
 package webconn
 
 import (
+	prcf "Project/websocket/config"
 	cache "Project/websocket/dbs/cache"
 	db "Project/websocket/dbs/database"
 	"errors"
@@ -12,16 +13,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var (
-	// MaxConnNum 最大的连接数
-	wsConnBucket chan notify
-	killChan     chan *userOne
-)
+func init() {
+	cf := prcf.ProConfig.GetServerConfig()
+	if err := initMaxConnNum(cf.CurrentConnLimit); err != nil {
+		log.Println(err)
+	}
+}
 
 // InitMaxConnNum 初始化最大连接数
-func InitMaxConnNum(num int) (err error) {
-	if num > maxConnLimit {
-		err = fmt.Errorf("wsConnBucket number not more than %d", maxConnLimit)
+func initMaxConnNum(num int) (err error) {
+	if num > cf.MaxConnLimit {
+		err = fmt.Errorf("wsConnBucket number not more than %d", cf.MaxConnLimit)
 		return
 	}
 	wsConnBucket = make(chan notify, num)
