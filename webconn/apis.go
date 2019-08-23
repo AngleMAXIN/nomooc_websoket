@@ -15,24 +15,24 @@ import (
 
 func init() {
 	cf := prcf.ProConfig.GetServerConfig()
-	if err := initMaxConnNum(cf.CurrentConnLimit); err != nil {
+	if err := setMaxConnNum(cf.CurrentConnLimit, cf.MaxConnLimit); err != nil {
 		log.Println(err)
 	}
 }
 
 // InitMaxConnNum 初始化最大连接数
-func initMaxConnNum(num int) (err error) {
-	if num > cf.MaxConnLimit {
+func setMaxConnNum(currNum, maxNum int) (err error) {
+	if currNum > maxNum {
 		err = fmt.Errorf("wsConnBucket number not more than %d", cf.MaxConnLimit)
 		return
 	}
-	wsConnBucket = make(chan notify, num)
+	wsConnBucket = make(chan notify, currNum)
 	return
 }
 
 // ListenkillSignal 监听conn断开信号，并更新用户状态
 func ListenkillSignal() {
-	killChan = make(chan *userOne, 5)
+	killChan = make(chan *userOne, 20)
 
 	for v := range killChan {
 		go db.MarkUserStatus(v.uID, v.contestID)

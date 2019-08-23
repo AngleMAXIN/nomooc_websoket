@@ -3,7 +3,6 @@ package cache
 import (
 	prcf "Project/websocket/config"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -16,7 +15,6 @@ func init() {
 // GetRedisConn 获得redis conn
 func GetRedisConn() *redis.Client {
 	cf := prcf.ProConfig.GetRedisConfig()
-
 	client := redis.NewClient(&redis.Options{
 		Addr:         fmt.Sprintf("%s:%d", cf.Host, cf.Port),
 		DialTimeout:  time.Duration(cf.DialTime) * time.Second,
@@ -27,11 +25,10 @@ func GetRedisConn() *redis.Client {
 		PoolSize:     cf.PoolSize,
 	})
 
-	pong, err := client.Ping().Result()
+	_, err := client.Ping().Result()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(pong)
 
 	return client
 }

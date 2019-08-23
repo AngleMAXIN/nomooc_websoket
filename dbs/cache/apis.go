@@ -10,15 +10,15 @@ import (
 func IncrOnlineNum(contestID int) (err error) {
 	var (
 		num int64
-		key string
+		key = fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)
 	)
-	key = fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)
-	num, err = redisDao.Incr(fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)).Result()
+	num, err = redisDao.Incr(key).Result()
 	if err == nil {
 		if num > 1000 {
 			_ = redisDao.Set(key, num-1, time.Hour*24).Err()
 		}
 	}
+	// fmt.Println("增加一人")
 	return
 }
 
@@ -26,16 +26,16 @@ func IncrOnlineNum(contestID int) (err error) {
 func DecrOnlineNum(contestID int) (err error) {
 	var (
 		num int64
-		key string
+		key = fmt.Sprintf("%s%d%s", keyPrefix, contestID, keySuffix)
 	)
 
 	num, err = redisDao.Decr(key).Result()
 	if err == nil {
-		if num == 0 {
+		if num <= 0 {
 			_ = redisDao.Set(key, 0, time.Hour*24).Err()
 		}
 	}
-
+	// fmt.Println("减少一人")
 	return
 }
 

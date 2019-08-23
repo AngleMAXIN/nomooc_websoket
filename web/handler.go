@@ -24,7 +24,6 @@ var (
 func WsListenHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var (
 		wsConn    *websocket.Conn
-		errInfo   *Err
 		err       error
 		uID       int
 		contestID int
@@ -32,28 +31,21 @@ func WsListenHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params
 
 	// 取出uID
 	if uID, err = strconv.Atoi(p.ByName("uID")); err != nil {
-		errInfo = &RequsetParamsError
-		goto ERR
+		SendResponse(w, &RequsetParamsError, nil)
 	}
 
 	// 取出contestID
 	if contestID, err = strconv.Atoi(p.ByName("contestID")); err != nil {
-		errInfo = &RequsetParamsError
-		goto ERR
+		SendResponse(w, &RequsetParamsError, nil)
 	}
 
 	if wsConn, err = upgrader.Upgrade(w, r, nil); err != nil {
-		errInfo = &WebSocketError
-		goto ERR
+		SendResponse(w, &WebSocketError, nil)
 	}
 
 	if err = webconn.StartConn(wsConn, uID, contestID); err != nil {
-		errInfo = &ConnectionLimitError
-		goto ERR
+		SendResponse(w, &ConnectionLimitError, nil)
 	}
-
-ERR:
-	SendResponse(w, errInfo, nil)
 
 }
 

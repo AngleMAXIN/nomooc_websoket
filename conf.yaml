@@ -13,7 +13,7 @@ redis:
   DialTime:  30 
   ReadTime:  10 
   WriteTime: 10 
-  PoolSize:     5
+  PoolSize:   12
     
 Server:
   host: 127.0.0.1
